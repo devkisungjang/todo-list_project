@@ -1,51 +1,24 @@
 <template>
   <v-app>
     <v-container>
-      <v-row>
-        <v-col>
-          <v-card>
-            <v-card-title class="primary--text">
-              ToDo List
+      <v-row justify="center">
+        <v-col cols="12" md="8">
+          <v-card class="pa-5">
+            <v-card-title class="text-center">
+              <h2>TODO LIST</h2>
             </v-card-title>
             <v-card-text>
-              <v-form v-model="valid">
-                <v-text-field
-                  label="New Task"
-                  v-model="newTask"
-                  :rules="[v => !!v || 'Task name is required']"
-                  @keyup.enter="addTask"
-                  color="primary"
-                ></v-text-field>
-                <v-btn color="primary" @click="addTask" :disabled="!valid">Add Task</v-btn>
-              </v-form>
+              <todo-form @add-todo="addTodo" />
+              <v-row justify="center" class="mb-3">
+                <v-btn-toggle v-model="filter" mandatory>
+                  <v-btn value="all">All</v-btn>
+                  <v-btn value="active">Active</v-btn>
+                  <v-btn value="completed">Completed</v-btn>
+                </v-btn-toggle>
+              </v-row>
+              <todo-list :todos="filteredTodos" @toggle-complete="toggleComplete" @delete-todo="deleteTodo" @edit-todo="editTodo" @update-todo="updateTodo"/>
+              <p v-if="!todos.length" class="text-center">추가할 항목이 없습니다</p>
             </v-card-text>
-            <v-divider></v-divider>
-            <v-list>
-              <v-list-item
-                v-for="(task, index) in tasks"
-                :key="index"
-                @click="toggleComplete(index)"
-                :class="{'completed-task': task.completed}"
-              >
-                <v-list-item-content>
-                  <v-text-field
-                    v-model="task.text"
-                    @blur="updateTask(index)"
-                    single-line
-                    :readonly="task.completed"
-                    color="primary"
-                  ></v-text-field>
-                </v-list-item-content>
-                <v-list-item-action v-if="task.completed">
-                  <v-chip color="primary" class="white--text">완료!</v-chip>
-                </v-list-item-action>
-                <v-list-item-action>
-                  <v-btn icon @click.stop="deleteTask(index)">
-                    <v-icon color="red">mdi-delete</v-icon>
-                  </v-btn>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
           </v-card>
         </v-col>
       </v-row>
@@ -54,47 +27,74 @@
 </template>
 
 <script>
+import TodoForm from './components/TodoForm.vue';
+import TodoList from './components/TodoList.vue';
+import TodoItem from './components/TodoItem.vue';
+
 export default {
+  name: 'App',
+  components: {
+    TodoForm,
+    TodoList,
+    TodoItem,
+  },
   data() {
     return {
-      valid: false,
-      newTask: '',
-      tasks: [],
+      todos: [],
+      filter: 'all',
+      editingTodo: null,
     };
   },
-  methods: {
-    addTask() {
-      if (this.newTask.trim() === '') return;
-      this.tasks.push({ text: this.newTask, completed: false });
-      this.newTask = '';
-    },
-    updateTask(index) {
-      if (this.tasks[index].text.trim() === '') {
-        this.deleteTask(index);
+  computed: {
+    filteredTodos() {
+      if (this.filter === 'active') {
+        return this.todos.filter(todo => !todo.completed);
+      } else if (this.filter === 'completed') {
+        return this.todos.filter(todo => todo.completed);
       }
+      return this.todos;
+    }
+  },
+  methods: {
+    addTodo(todo) {
+      this.todos.push(todo);
     },
-    deleteTask(index) {
-      this.tasks.splice(index, 1);
+    toggleComplete(todo) {
+      todo.completed = !todo.completed;
     },
-    toggleComplete(index) {
-      this.tasks[index].completed = !this.tasks[index].completed;
+    deleteTodo(todo) {
+      this.todos = this.todos.filter(t => t !== todo);
     },
+    editTodo(todo) {
+      this.editingTodo = todo;
+    },
+    updateTodo(updatedTodo) {
+      const index = this.todos.findIndex(todo => todo === this.editingTodo);
+      if (index !== -1) {
+        this.todos.splice(index, 1, updatedTodo);
+        this.editingTodo = null;
+      }
+    }
   },
 };
 </script>
 
 <style>
-.primary--text {
-  color: #00AEEF !important;
+h2 {
+  color: #3f51b5;
+  font-family: 'Arial', sans-serif;
 }
-.completed-task .v-text-field input {
-  text-decoration: line-through;
-  color: grey;
+
+.text-center {
+  text-align: center;
 }
-.completed-task {
-  opacity: 0.6;
+
+.v-card {
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-.v-btn.primary {
-  background-color: #00AEEF !important;
+
+.v-btn-toggle .v-btn {
+  border-radius: 8px;
 }
 </style>
