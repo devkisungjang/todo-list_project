@@ -11,13 +11,13 @@
               <todo-form @add-todo="addTodo" />
               <v-row justify="center" class="mb-3">
                 <v-btn-toggle v-model="filter" mandatory>
-                  <v-btn value="all">All</v-btn>
-                  <v-btn value="active">Active</v-btn>
-                  <v-btn value="completed">Completed</v-btn>
+                  <v-btn value="all">전체</v-btn>
+                  <v-btn value="active">진행 중</v-btn>
+                  <v-btn value="completed">완료</v-btn>
                 </v-btn-toggle>
               </v-row>
               <todo-list :todos="filteredTodos" @toggle-complete="toggleComplete" @delete-todo="deleteTodo" @edit-todo="editTodo" @update-todo="updateTodo"/>
-              <p v-if="!todos.length" class="text-center">추가할 항목이 없습니다</p>
+              <p v-if="!todos.length" class="text-center">할 일을 추가해주세요 !</p>
             </v-card-text>
           </v-card>
         </v-col>
@@ -96,5 +96,6 @@ h2 {
 
 .v-btn-toggle .v-btn {
   border-radius: 8px;
+  font-size: medium;
 }
 </style>

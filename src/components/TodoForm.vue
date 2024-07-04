@@ -4,7 +4,7 @@
       <v-col cols="12">
         <v-text-field
           v-model="title"
-          label="What needs to be done?"
+          label="오늘은 어떤 일을 하실 건가요?"
           outlined
           clearable
         ></v-text-field>

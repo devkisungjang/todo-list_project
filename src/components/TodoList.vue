@@ -1,61 +1,61 @@
 <template>
   <v-list>
     <v-list-item v-for="(todo, index) in todos" :key="index" class="todo-item">
-      <v-list-item-content>
-        <v-text-field
-          v-if="editingTodo === todo"
-          v-model="todo.title"
-          @keyup.enter="saveTodo"
-          outlined
-          ref="editInput"
-          full-width
-        ></v-text-field>
-        <v-list-item-title v-else :class="{ completed: todo.completed }">
-          {{ todo.title }}
+      <v-list-item-content class="d-flex w-100">
+        <v-list-item-title :class="{ completed: todo.completed }">
+          <v-text-field
+            v-if="editingTodo === todo"
+            v-model="todo.title"
+            @keyup.enter="saveTodo"
+            outlined
+            ref="editInput"
+            full-width
+          ></v-text-field>
+          <span v-else>{{ todo.title }}</span>
         </v-list-item-title>
+        <div class="action-buttons">
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                @click="$emit('toggle-complete', todo)"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon color="green">{{
+                  todo.completed
+                    ? "mdi-check-circle-outline"
+                    : "mdi-checkbox-blank-circle-outline"
+                }}</v-icon>
+              </v-btn>
+            </template>
+            <span>{{
+              todo.completed ? "Mark as Incomplete" : "Mark as Complete"
+            }}</span>
+          </v-tooltip>
+          <v-tooltip top v-if="!todo.completed">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn icon @click="editTodo(todo)" v-bind="attrs" v-on="on">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </template>
+            <span>Edit</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                @click="$emit('delete-todo', todo)"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon color="red">mdi-delete</v-icon>
+              </v-btn>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
+        </div>
       </v-list-item-content>
-      <v-list-item-action class="action-buttons">
-        <v-tooltip top>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              @click="$emit('toggle-complete', todo)"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon color="green">{{
-                todo.completed
-                  ? "mdi-check-circle-outline"
-                  : "mdi-checkbox-blank-circle-outline"
-              }}</v-icon>
-            </v-btn>
-          </template>
-          <span>{{
-            todo.completed ? "Mark as Incomplete" : "Mark as Complete"
-          }}</span>
-        </v-tooltip>
-        <v-tooltip top v-if="!todo.completed">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn icon @click="editTodo(todo)" v-bind="attrs" v-on="on">
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </template>
-          <span>Edit</span>
-        </v-tooltip>
-        <v-tooltip top>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              @click="$emit('delete-todo', todo)"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon color="red">mdi-delete</v-icon>
-            </v-btn>
-          </template>
-          <span>Delete</span>
-        </v-tooltip>
-      </v-list-item-action>
     </v-list-item>
   </v-list>
 </template>
@@ -92,9 +92,9 @@ export default {
 <style scoped>
 .todo-item {
   border-bottom: 1px solid #e0e0e0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+  width: 100%;
+  height: 100px;
 }
 
 .completed {
@@ -102,13 +102,23 @@ export default {
   color: grey;
 }
 
-.v-list-item-action {
+.v-list-item-content {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.v-list-item-title {
+  margin-left: 16px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
 }
 
 .action-buttons {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 </style>
